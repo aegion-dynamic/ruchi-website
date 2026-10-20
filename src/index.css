@@ -154,16 +154,18 @@ p { color: var(--muted); }
 .list-benefits svg { color: var(--olive); }
 .meet-kolam { position: absolute; width: 350px; left: -130px; bottom: -70px; color: var(--terracotta); opacity: .11; }
 
-.how { z-index: 1; overflow: hidden; background: #fdf5e9; }
+.how { z-index: 1; overflow: clip; background: #fdf5e9; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); position: relative; }
 .steps::before { content: ""; position: absolute; left: 17%; right: 17%; top: 35px; height: 1px; background: var(--cream-dark); }
 .step { position: relative; text-align: center; }
 .step-number { width: 68px; height: 68px; margin: 0 auto 35px; display: grid; place-items: center; position: relative; z-index: 2; border: 1px solid var(--border); border-radius: 50%; color: var(--maroon); background: var(--ivory); font: 20px var(--serif); }
 .how-phone { width: 220px; padding: 6px; margin: auto; border-radius: 34px; background: #211d1b; box-shadow: 0 22px 40px rgba(74,37,24,.18); overflow: hidden; transform: translate3d(0, var(--how-parallax-y, 0), 0); will-change: transform; }
 .how-phone img { width: 100%; height: auto; border-radius: 28px; object-fit: contain; }
-.how-phone-scroll { display: none; }
+.how-phone { position: relative; }
+.how-stage { display: none; }
 .step h3 { font: 25px var(--serif); margin: 27px 0 8px; }
 .step > p { max-width: 260px; margin: auto; font-size: 12px; }
+.how-clip { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .how-kolam { position: absolute; width: 410px; right: -190px; top: 140px; color: var(--terracotta); opacity: .1; transform: translate3d(0, var(--how-kolam-y, 0), 0); will-change: transform; }
 
 .audiences { background: var(--cream); }
@@ -319,7 +321,9 @@ footer .app-logo { filter: brightness(1.15); }
   .recipe-grid { grid-auto-columns: calc((var(--recipe-view) - 18px) / 2); }
   .problem-grid .problem-card { border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,.4); padding: 24px 22px; }
   .meet-grid { gap: 45px; }
-  .audience-grid { gap: 35px; }
+    .demo-caption-user { right: -4px; }
+    .demo-caption-ruchi { left: -4px; }
+    .audience-grid { gap: 35px; }
   .story { grid-template-columns: 1fr 1fr; }
   .story-copy { padding: 70px 7vw; }
   .download { gap: 40px; }
@@ -359,18 +363,23 @@ footer .app-logo { filter: brightness(1.15); }
   .meet-grid { grid-template-columns: 1fr; grid-template-areas: "copy" "stage" "options"; gap: 30px; }
   .demo-stage { height: 625px; transform: none; margin: 0; }
   .demo-image-frame { width: min(286px, 76vw); }
-  .demo-caption-user { right: -18px; }
-  .demo-caption-ruchi { left: -18px; }
-  .meet-copy h2 { font-size: 2.8rem; }
+    .meet-copy h2 { font-size: 2.8rem; }
   .demo-tabs { max-width: 100%; overflow-x: auto; touch-action: pan-y; }
   .demo-tabs button { white-space: nowrap; }
   .steps { grid-template-columns: 1fr; gap: 65px; }
   .steps::before { left: 50%; top: 30px; bottom: 30px; width: 1px; height: auto; }
   .step-number, .how-phone, .step h3, .step p { position: relative; z-index: 2; }
-  .how-phone-scroll { display: block; position: sticky; top: 105px; z-index: 3; width: min(250px, 62vw); aspect-ratio: 800 / 1734; margin: 0 auto 40px; padding: 6px; border-radius: 34px; background: #211d1b; box-shadow: 0 22px 40px rgba(74,37,24,.18); overflow: hidden; }
-  .how-phone-scroll img { position: absolute; inset: 6px; border-radius: 28px; object-fit: cover; opacity: 0; transform: translateY(16px) scale(.98); transition: opacity .45s ease-out, transform .55s cubic-bezier(.23, 1, .32, 1); }
-  .how-phone-scroll img.is-active { opacity: 1; transform: none; }
-  .step .how-phone { display: none; }
+  .how-stage { display: flex; position: sticky; top: 0; z-index: 3; min-height: 100svh; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding: calc(72px + env(safe-area-inset-top, 0px)) 0 36px; will-change: transform; }
+  .how-stage .how-phone { width: min(240px, 62vw); aspect-ratio: 800 / 1734; }
+  .how-stage .how-phone img { position: absolute; inset: 6px; border-radius: 28px; object-fit: cover; }
+  .how-stage-label { position: relative; min-height: 150px; text-align: center; }
+  .how-stage-label > div { position: absolute; inset: 0; }
+  .how-stage-label .step-number { margin: 0 auto 14px; width: 62px; height: 62px; font-size: 18px; }
+  .how-stage-label h3 { margin: 0 0 10px; font: 25px var(--serif); color: var(--charcoal); }
+  .how-stage-label p { margin: 0 auto; max-width: 260px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .step { display: none; }
+  .steps { min-height: 200svh; }
+  .steps::before { display: none; }
   .audience-grid { grid-template-columns: 1fr; }
   .audience-image { min-height: 480px; border-radius: 150px 150px 20px 20px; }
   .audience-item { grid-template-columns: 30px 1fr; }
