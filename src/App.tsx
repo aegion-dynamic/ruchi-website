@@ -757,6 +757,8 @@ function DemoSection() {
             where you are in the recipe and responds with practical, contextual
             help
           </p>
+        </div>
+        <div className="meet-options reveal">
           <div
             className="demo-tabs"
             ref={tabsRef}
@@ -801,6 +803,81 @@ function DemoSection() {
               <Icon name="check" /> Get help without losing your place
             </span>
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const howSteps = [
+  ["01", "Find your dish", "Search a recipe or explore dishes using what you have", findDishScreen],
+  ["02", "Start cooking", "Follow one calm, clear instruction at a time", startCookingScreen],
+  ["03", "Talk, ask, and cook", "Clarify steps, pause, set timers, and ask for help", talkCookScreen],
+] as const
+
+function HowSection() {
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    const cards = [...document.querySelectorAll<HTMLElement>(".how .step")]
+    if (cards.length === 0) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        let best = -1
+        let bestRatio = 0
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+            best = Number((e.target as HTMLElement).dataset.step)
+            bestRatio = e.intersectionRatio
+          }
+        }
+        if (best >= 0) setActive(best)
+      },
+      { threshold: [0.2, 0.4, 0.6, 0.8] },
+    )
+    cards.forEach((card) => io.observe(card))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <section className="section how" id="how">
+      <Kolam className="how-kolam" />
+      <div className="container">
+        <SectionHeading
+          eyebrow="HOW IT WORKS"
+          title="From craving to cooking, in three simple steps"
+        />
+        <div className="how-phone-scroll" aria-hidden="true">
+          {howSteps.map(([num, , , screen], i) => (
+            <img
+              key={num}
+              src={screen}
+              alt=""
+              className={i === active ? "is-active" : ""}
+            />
+          ))}
+        </div>
+        <div className="steps">
+          {howSteps.map(([num, title, copy, screen], i) => (
+            <article
+              className="step reveal"
+              style={{ "--stagger": `${i * 90}ms` } as React.CSSProperties}
+              key={num}
+              data-step={i}
+            >
+              <div className="step-number">{num}</div>
+              <div className="how-phone">
+                <img
+                  src={screen}
+                  alt={`${title} Ruchi app screen`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -985,55 +1062,7 @@ function App() {
 
         <DemoSection />
 
-        <section className="section how" id="how">
-          <Kolam className="how-kolam" />
-          <div className="container">
-            <SectionHeading
-              eyebrow="HOW IT WORKS"
-              title="From craving to cooking, in three simple steps"
-            />
-            <div className="steps">
-              {[
-                [
-                  "01",
-                  "Find your dish",
-                  "Search a recipe or explore dishes using what you have",
-                  findDishScreen,
-                ],
-                [
-                  "02",
-                  "Start cooking",
-                  "Follow one calm, clear instruction at a time",
-                  startCookingScreen,
-                ],
-                [
-                  "03",
-                  "Talk, ask, and cook",
-                  "Clarify steps, pause, set timers, and ask for help",
-                  talkCookScreen,
-                ],
-              ].map(([num, title, copy, screen], i) => (
-                <article
-                  className="step reveal"
-                  style={{ "--stagger": `${i * 90}ms` } as React.CSSProperties}
-                  key={num}
-                >
-                  <div className="step-number">{num}</div>
-                  <div className="how-phone">
-                    <img
-                      src={screen}
-                      alt={`${title} Ruchi app screen`}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <HowSection />
 
         <section className="section audiences">
           <div className="container">

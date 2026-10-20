@@ -122,7 +122,10 @@ p { color: var(--muted); }
 .problem-card p { margin: 0; font-size: 13px; }
 
 .meet { overflow: hidden; }
-.meet-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 100px; }
+.meet-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "copy stage" "options stage"; align-items: center; column-gap: 100px; row-gap: 36px; }
+.meet-copy { grid-area: copy; }
+.meet-options { grid-area: options; }
+.demo-stage { grid-area: stage; }
 .demo-stage { height: 700px; position: relative; display: grid; place-items: center; }
 .phone-backdrop { position: absolute; width: 440px; height: 560px; border-radius: 220px 220px 24px 24px; background: var(--cream); }
 .demo-image-frame { width: 286px; height: 620px; padding: 8px; position: relative; z-index: 3; border-radius: 42px; background: #211d1b; box-shadow: 0 32px 75px rgba(74,37,24,.25); transform: rotate(-2deg); }
@@ -158,6 +161,7 @@ p { color: var(--muted); }
 .step-number { width: 68px; height: 68px; margin: 0 auto 35px; display: grid; place-items: center; position: relative; z-index: 2; border: 1px solid var(--border); border-radius: 50%; color: var(--maroon); background: var(--ivory); font: 20px var(--serif); }
 .how-phone { width: 220px; padding: 6px; margin: auto; border-radius: 34px; background: #211d1b; box-shadow: 0 22px 40px rgba(74,37,24,.18); overflow: hidden; transform: translate3d(0, var(--how-parallax-y, 0), 0); will-change: transform; }
 .how-phone img { width: 100%; height: auto; border-radius: 28px; object-fit: contain; }
+.how-phone-scroll { display: none; }
 .step h3 { font: 25px var(--serif); margin: 27px 0 8px; }
 .step > p { max-width: 260px; margin: auto; font-size: 12px; }
 .how-kolam { position: absolute; width: 410px; right: -190px; top: 140px; color: var(--terracotta); opacity: .1; transform: translate3d(0, var(--how-kolam-y, 0), 0); will-change: transform; }
@@ -311,10 +315,9 @@ footer .app-logo { filter: brightness(1.15); }
   .hero-copy > p { margin-inline: auto; }
   .hero-actions, .benefit-row { justify-content: center; }
   .hero-visual { width: min(620px, 100%); margin: auto; }
-  .problem-grid { grid-template-columns: repeat(2, 1fr); }
+  .problem-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px 0; border: 0; }
   .recipe-grid { grid-auto-columns: calc((var(--recipe-view) - 18px) / 2); }
-  .problem-card:nth-child(2) { border-right: 0; }
-  .problem-card:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .problem-grid .problem-card { border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,.4); padding: 24px 22px; }
   .meet-grid { gap: 45px; }
   .audience-grid { gap: 35px; }
   .story { grid-template-columns: 1fr 1fr; }
@@ -329,7 +332,8 @@ footer .app-logo { filter: brightness(1.15); }
   .section-heading { margin-bottom: 42px; }
   .section-heading h2 { font-size: 2.7rem; }
   .nav-wrap { padding: calc(10px + env(safe-area-inset-top, 0px)) 0; }
-  .nav { height: 48px; }
+  .nav { height: 48px; justify-content: flex-start; gap: 10px; }
+  .country-drop { margin-left: auto; }
   .nav-wrap.scrolled, .floating-card, .hero-photo span { backdrop-filter: none; }
   .app-logo { width: 104px; height: 46px; }
   .nav-links { display: flex; visibility: hidden; opacity: 0; transform: translateY(-10px); pointer-events: none; position: absolute; inset: 66px 16px auto; padding: 22px; flex-direction: column; align-items: stretch; gap: 0; background: var(--ivory); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); transition: opacity .25s ease-out, transform .25s ease-out, visibility 0s linear .25s; }
@@ -350,11 +354,11 @@ footer .app-logo { filter: brightness(1.15); }
   .hero-photo span { display: none; }
   .float-timer { right: 10px; top: 48px; }
   .float-voice { left: 4px; bottom: 26px; }
-  .problem-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border: 0; margin-right: -16px; padding-right: 16px; touch-action: pan-y; }
-  .problem-card { min-width: 82vw; scroll-snap-align: start; border: 1px solid var(--border) !important; border-radius: 18px; margin-right: 12px; background: rgba(255,255,255,.4); }
-  .meet-grid { grid-template-columns: 1fr; gap: 30px; }
-  .demo-stage { height: 625px; order: 2; transform: scale(.9); margin: -25px 0 -45px; }
-  .demo-image-frame { width: 286px; }
+  .problem-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border: 0; margin-right: -16px; padding-right: 16px; touch-action: pan-x; }
+  .problem-card { min-width: 78vw; scroll-snap-align: start; border: 1px solid var(--border) !important; border-radius: 18px; margin-right: 12px; background: rgba(255,255,255,.4); }
+  .meet-grid { grid-template-columns: 1fr; grid-template-areas: "copy" "stage" "options"; gap: 30px; }
+  .demo-stage { height: 625px; transform: none; margin: 0; }
+  .demo-image-frame { width: min(286px, 76vw); }
   .demo-caption-user { right: -18px; }
   .demo-caption-ruchi { left: -18px; }
   .meet-copy h2 { font-size: 2.8rem; }
@@ -363,6 +367,10 @@ footer .app-logo { filter: brightness(1.15); }
   .steps { grid-template-columns: 1fr; gap: 65px; }
   .steps::before { left: 50%; top: 30px; bottom: 30px; width: 1px; height: auto; }
   .step-number, .how-phone, .step h3, .step p { position: relative; z-index: 2; }
+  .how-phone-scroll { display: block; position: sticky; top: 105px; z-index: 3; width: min(250px, 62vw); aspect-ratio: 800 / 1734; margin: 0 auto 40px; padding: 6px; border-radius: 34px; background: #211d1b; box-shadow: 0 22px 40px rgba(74,37,24,.18); overflow: hidden; }
+  .how-phone-scroll img { position: absolute; inset: 6px; border-radius: 28px; object-fit: cover; opacity: 0; transform: translateY(16px) scale(.98); transition: opacity .45s ease-out, transform .55s cubic-bezier(.23, 1, .32, 1); }
+  .how-phone-scroll img.is-active { opacity: 1; transform: none; }
+  .step .how-phone { display: none; }
   .audience-grid { grid-template-columns: 1fr; }
   .audience-image { min-height: 480px; border-radius: 150px 150px 20px 20px; }
   .audience-item { grid-template-columns: 30px 1fr; }
