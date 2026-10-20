@@ -757,6 +757,8 @@ function DemoSection() {
             where you are in the recipe and responds with practical, contextual
             help
           </p>
+        </div>
+        <div className="meet-options reveal">
           <div
             className="demo-tabs"
             ref={tabsRef}
@@ -801,6 +803,48 @@ function DemoSection() {
               <Icon name="check" /> Get help without losing your place
             </span>
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const howSteps = [
+  ["01", "Find your dish", "Search a recipe or explore dishes using what you have", findDishScreen],
+  ["02", "Start cooking", "Follow one calm, clear instruction at a time", startCookingScreen],
+  ["03", "Talk, ask, and cook", "Clarify steps, pause, set timers, and ask for help", talkCookScreen],
+] as const
+
+function HowSection() {
+  return (
+    <section className="section how" id="how">
+      <Kolam className="how-kolam" />
+      <div className="container">
+        <SectionHeading
+          eyebrow="HOW IT WORKS"
+          title="From craving to cooking, in three simple steps"
+        />
+        <div className="steps">
+          {howSteps.map(([num, title, copy, screen], i) => (
+            <article
+              className="step reveal"
+              style={{ "--stagger": `${i * 90}ms` } as React.CSSProperties}
+              key={num}
+              data-step={i}
+            >
+              <div className="step-number">{num}</div>
+              <div className="how-phone">
+                <img
+                  src={screen}
+                  alt={`${title} Ruchi app screen`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -985,55 +1029,7 @@ function App() {
 
         <DemoSection />
 
-        <section className="section how" id="how">
-          <Kolam className="how-kolam" />
-          <div className="container">
-            <SectionHeading
-              eyebrow="HOW IT WORKS"
-              title="From craving to cooking, in three simple steps"
-            />
-            <div className="steps">
-              {[
-                [
-                  "01",
-                  "Find your dish",
-                  "Search a recipe or explore dishes using what you have",
-                  findDishScreen,
-                ],
-                [
-                  "02",
-                  "Start cooking",
-                  "Follow one calm, clear instruction at a time",
-                  startCookingScreen,
-                ],
-                [
-                  "03",
-                  "Talk, ask, and cook",
-                  "Clarify steps, pause, set timers, and ask for help",
-                  talkCookScreen,
-                ],
-              ].map(([num, title, copy, screen], i) => (
-                <article
-                  className="step reveal"
-                  style={{ "--stagger": `${i * 90}ms` } as React.CSSProperties}
-                  key={num}
-                >
-                  <div className="step-number">{num}</div>
-                  <div className="how-phone">
-                    <img
-                      src={screen}
-                      alt={`${title} Ruchi app screen`}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <HowSection />
 
         <section className="section audiences">
           <div className="container">
@@ -1269,11 +1265,10 @@ function RecipeDiscovery() {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     // Auto-pan for precise pointers; touch users scroll the strip
-    // themselves, so the motion always has a user-controlled alternative.
-    // Like the FAQ marquee, the pan keeps running under reduced motion
-    // (hovering stops it), so the strip never looks frozen.
-    el.classList.toggle("recipe-auto-pan", canTrackPointer)
-    if (!canTrackPointer || reducedMotion) return
+        // themselves, so the motion always has a user-controlled alternative.
+        // Under reduced motion the strip stays still but natively scrollable.
+        el.classList.toggle("recipe-auto-pan", canTrackPointer && !reducedMotion)
+        if (!canTrackPointer || reducedMotion) return
     let target = el.scrollLeft
     let raf = 0
     const tick = () => {

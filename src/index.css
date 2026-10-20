@@ -56,9 +56,7 @@ p { color: var(--muted); }
 .app-logo.compact { width: 54px; height: 25px; object-position: left center; }
 .nav-links { display: flex; align-items: center; gap: 30px; margin-left: auto; }
 .nav-links a { color: #554d47; font-size: 13px; transition: color .2s; }
-.nav-links a:hover { color: var(--maroon); }
 .nav-cta { height: 43px; padding: 0 20px; border-radius: 99px; display: inline-flex; align-items: center; gap: 10px; color: white; background: var(--maroon); font-size: 13px; font-weight: 500; transition: transform .16s ease-out, background .2s; }
-.nav-cta:hover { background: var(--maroon-dark); }
 .menu-button, .mobile-download { display: none; }
 .country-drop { position: relative; }
 .country-btn { display: inline-flex; align-items: center; gap: 7px; height: 43px; padding: 0 14px; border: 1px solid var(--border); border-radius: 99px; background: rgba(255,249,240,.7); color: var(--charcoal); font-size: 12px; font-weight: 500; cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .16s ease-out; }
@@ -81,9 +79,7 @@ p { color: var(--muted); }
 .hero-copy > p { max-width: 595px; font-size: 17px; line-height: 1.8; }
 .hero-actions { display: flex; gap: 12px; margin: 34px 0; }
 .button { min-height: 52px; padding: 0 23px; border-radius: 99px; border: 1px solid var(--maroon); display: inline-flex; justify-content: center; align-items: center; gap: 12px; background: var(--maroon); color: var(--white); font-weight: 500; font-size: 13px; transition: transform .16s ease-out, background .25s ease, box-shadow .25s ease; }
-.button:hover { background: var(--maroon-dark); box-shadow: 0 10px 24px rgba(120,15,24,.2); }
 .button-secondary { color: var(--maroon); background: transparent; }
-.button-secondary:hover { background: rgba(120,15,24,.06); }
 .benefit-row { display: flex; align-items: center; gap: 26px; padding-top: 6px; color: #5f5750; font-size: 12px; font-weight: 500; }
 .benefit-row span { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
 .hero-visual { height: 650px; position: relative; }
@@ -122,7 +118,10 @@ p { color: var(--muted); }
 .problem-card p { margin: 0; font-size: 13px; }
 
 .meet { overflow: hidden; }
-.meet-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 100px; }
+.meet-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "copy stage" "options stage"; align-items: center; column-gap: 100px; row-gap: 36px; }
+.meet-copy { grid-area: copy; }
+.meet-options { grid-area: options; }
+.demo-stage { grid-area: stage; }
 .demo-stage { height: 700px; position: relative; display: grid; place-items: center; }
 .phone-backdrop { position: absolute; width: 440px; height: 560px; border-radius: 220px 220px 24px 24px; background: var(--cream); }
 .demo-image-frame { width: 286px; height: 620px; padding: 8px; position: relative; z-index: 3; border-radius: 42px; background: #211d1b; box-shadow: 0 32px 75px rgba(74,37,24,.25); transform: rotate(-2deg); }
@@ -208,7 +207,6 @@ p { color: var(--muted); }
 .plan-card.featured .plan-features li { color: rgba(255,255,255,.92); }
 .plan-card.featured .plan-features li svg { color: var(--turmeric); }
 .plan-card.featured .button { background: var(--ivory); color: var(--maroon); border-color: var(--ivory); box-shadow: 0 10px 24px rgba(40,10,8,.25); }
-.plan-card.featured .button:hover { background: var(--white); }
 
 .story { min-height: 760px; display: grid; grid-template-columns: 1.15fr .85fr; background: var(--maroon); overflow: hidden; }
 .story-image { min-height: 760px; }
@@ -274,7 +272,6 @@ p { color: var(--muted); }
 .download h2 { font-size: clamp(3rem, 5vw, 5rem); margin: 18px 0 22px; }
 .download p { color: rgba(255,249,240,.67); font-size: 16px; }
 .light-button { margin-top: 18px; color: var(--maroon-dark); background: var(--ivory); border-color: var(--ivory); }
-.light-button:hover { color: var(--maroon); background: white; }
 .download-kolam { position: absolute; width: 360px; color: var(--turmeric); opacity: .09; }
 .download-kolam.left { left: -120px; bottom: -100px; }
 .download-kolam.right { right: -90px; top: -110px; }
@@ -285,7 +282,6 @@ footer { padding: 75px 0 25px; color: rgba(255,249,240,.75); background: #320201
 footer .app-logo { filter: brightness(1.15); }
 .footer-grid > div:not(.footer-brand) { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; font-size: 10px; }
 .footer-grid strong { margin-bottom: 8px; color: white; font-size: 11px; text-transform: uppercase; letter-spacing: .13em; }
-.footer-grid a:hover { color: white; }
 .footer-grid span { color: rgba(255,249,240,.42); }
 .footer-bottom { margin-top: 55px; padding-top: 22px; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.1); font-size: 9px; color: rgba(255,255,255,.35); }
 
@@ -311,12 +307,13 @@ footer .app-logo { filter: brightness(1.15); }
   .hero-copy > p { margin-inline: auto; }
   .hero-actions, .benefit-row { justify-content: center; }
   .hero-visual { width: min(620px, 100%); margin: auto; }
-  .problem-grid { grid-template-columns: repeat(2, 1fr); }
+  .problem-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px 0; border: 0; }
   .recipe-grid { grid-auto-columns: calc((var(--recipe-view) - 18px) / 2); }
-  .problem-card:nth-child(2) { border-right: 0; }
-  .problem-card:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .problem-grid .problem-card { border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,.4); padding: 24px 22px; }
   .meet-grid { gap: 45px; }
-  .audience-grid { gap: 35px; }
+    .demo-caption-user { right: -4px; }
+    .demo-caption-ruchi { left: -4px; }
+    .audience-grid { gap: 35px; }
   .story { grid-template-columns: 1fr 1fr; }
   .story-copy { padding: 70px 7vw; }
   .download { gap: 40px; }
@@ -329,7 +326,8 @@ footer .app-logo { filter: brightness(1.15); }
   .section-heading { margin-bottom: 42px; }
   .section-heading h2 { font-size: 2.7rem; }
   .nav-wrap { padding: calc(10px + env(safe-area-inset-top, 0px)) 0; }
-  .nav { height: 48px; }
+  .nav { height: 48px; justify-content: flex-start; gap: 10px; }
+  .country-drop { margin-left: auto; }
   .nav-wrap.scrolled, .floating-card, .hero-photo span { backdrop-filter: none; }
   .app-logo { width: 104px; height: 46px; }
   .nav-links { display: flex; visibility: hidden; opacity: 0; transform: translateY(-10px); pointer-events: none; position: absolute; inset: 66px 16px auto; padding: 22px; flex-direction: column; align-items: stretch; gap: 0; background: var(--ivory); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); transition: opacity .25s ease-out, transform .25s ease-out, visibility 0s linear .25s; }
@@ -350,14 +348,12 @@ footer .app-logo { filter: brightness(1.15); }
   .hero-photo span { display: none; }
   .float-timer { right: 10px; top: 48px; }
   .float-voice { left: 4px; bottom: 26px; }
-  .problem-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border: 0; margin-right: -16px; padding-right: 16px; touch-action: pan-y; }
-  .problem-card { min-width: 82vw; scroll-snap-align: start; border: 1px solid var(--border) !important; border-radius: 18px; margin-right: 12px; background: rgba(255,255,255,.4); }
-  .meet-grid { grid-template-columns: 1fr; gap: 30px; }
-  .demo-stage { height: 625px; order: 2; transform: scale(.9); margin: -25px 0 -45px; }
-  .demo-image-frame { width: 286px; }
-  .demo-caption-user { right: -18px; }
-  .demo-caption-ruchi { left: -18px; }
-  .meet-copy h2 { font-size: 2.8rem; }
+  .problem-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border: 0; margin-right: -16px; padding-right: 16px; touch-action: pan-x; }
+  .problem-card { min-width: 78vw; scroll-snap-align: start; border: 1px solid var(--border) !important; border-radius: 18px; margin-right: 12px; background: rgba(255,255,255,.4); }
+  .meet-grid { grid-template-columns: 1fr; grid-template-areas: "copy" "stage" "options"; gap: 30px; }
+  .demo-stage { height: 625px; transform: none; margin: 0; }
+  .demo-image-frame { width: min(286px, 76vw); }
+    .meet-copy h2 { font-size: 2.8rem; }
   .demo-tabs { max-width: 100%; overflow-x: auto; touch-action: pan-y; }
   .demo-tabs button { white-space: nowrap; }
   .steps { grid-template-columns: 1fr; gap: 65px; }
@@ -384,24 +380,27 @@ footer .app-logo { filter: brightness(1.15); }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .button:hover { transform: translateY(-3px); }
-  .nav-cta:hover { transform: translateY(-2px); }
+  .nav-links a:hover { color: var(--maroon); }
+    .button:hover { background: var(--maroon-dark); box-shadow: 0 10px 24px rgba(120,15,24,.2); transform: translateY(-3px); }
+    .button-secondary:hover { background: rgba(120,15,24,.06); }
+    .nav-cta:hover { background: var(--maroon-dark); transform: translateY(-2px); }
   .country-btn:hover { border-color: rgba(120,15,24,.28); background: var(--white); }
   .country-option:hover { background: rgba(120,15,24,.07); color: var(--maroon); }
   .plan-card:hover { transform: translateY(-6px); box-shadow: 0 24px 50px rgba(78,39,25,.13); border-color: rgba(120,15,24,.22); }
   .plan-card.featured:hover { border-color: transparent; box-shadow: 0 28px 56px rgba(120,15,24,.28); }
+  .plan-card.featured .button:hover { background: var(--white); }
+  .light-button:hover { color: var(--maroon); background: white; }
   .scroller-mask:hover .animate-scroll-horizontal, .scroller-mask:hover .animate-scroll-horizontal-reverse { animation-play-state: paused; }
   .faq-card:hover { transform: translateY(-4px); border-color: rgba(120,15,24,.25); box-shadow: 0 18px 38px rgba(78,39,25,.15); }
   .recipe-card:hover img { transform: scale(1.05); }
+  .footer-grid a:hover { color: white; }
 }
 .button:active, .nav-cta:active, .demo-tabs button:active, .menu-button:active { transform: scale(.97); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .animate-scroll-horizontal, .animate-scroll-horizontal-reverse { animation-duration: var(--scroll-duration, 40s) !important; animation-iteration-count: infinite !important; }
-  .recipe-viewport.recipe-auto-pan .recipe-grid { animation-duration: 52s !important; animation-iteration-count: infinite !important; }
-  .reveal, .reveal-ready .reveal, .reveal-ready .reveal:not(.visible), .section-reveal, .reveal-ready .section-reveal, .hero-in { opacity: 1; transform: none; filter: none; }
+    .reveal, .reveal-ready .reveal, .reveal-ready .reveal:not(.visible), .section-reveal, .reveal-ready .section-reveal, .hero-in { opacity: 1; transform: none; filter: none; }
   .how-phone, .how-kolam { transform: none; }
   .recipe-viewport:not(.recipe-auto-pan) .recipe-grid { animation: none; }
   .recipe-viewport .recipe-card { opacity: 1; transform: none; animation: none; }
