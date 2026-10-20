@@ -816,98 +816,14 @@ const howSteps = [
 ] as const
 
 function HowSection() {
-  const [view, setView] = useState({ step: 0, b: 0, p: 0 })
-
-  useEffect(() => {
-    let raf = 0
-    const update = () => {
-      const runway = document.querySelector<HTMLElement>(".how .steps")
-      if (!runway) return
-      const r = runway.getBoundingClientRect()
-      const range = r.height - window.innerHeight
-      if (range <= 0) return
-      const p = Math.min(1, Math.max(0, -r.top / range))
-      const t = p * howSteps.length
-      let step = Math.min(howSteps.length - 1, Math.floor(t))
-      let b = t - step
-      if (b >= 0.5) b = 0
-      else b = b * 2
-      if (t >= howSteps.length) {
-        step = howSteps.length - 1
-        b = 0
-      }
-      setView({ step, b, p })
-    }
-    const onScroll = () => {
-      if (raf) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        update()
-      })
-    }
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [])
-
-  const layerState = (i: number, k: number) => {
-    const out = view.step === i && view.b > 0
-    const inn = view.step + 1 === i
-    return {
-      op: out ? 1 - view.b : inn ? view.b : view.step === i ? 1 : 0,
-      y: out ? -k * view.b : inn ? k * (1 - view.b) : 0,
-    }
-  }
-
   return (
     <section className="section how" id="how">
-      <div className="how-clip" aria-hidden="true">
-        <Kolam className="how-kolam" />
-      </div>
+      <Kolam className="how-kolam" />
       <div className="container">
         <SectionHeading
           eyebrow="HOW IT WORKS"
           title="From craving to cooking, in three simple steps"
         />
-        <div
-          className="how-stage"
-          style={{ transform: `translateY(${(0.5 - view.p) * 3}vh)` }}
-        >
-          <div className="how-stage-label">
-            {howSteps.map(([num, title, copy], i) => {
-              const { op, y } = layerState(i, 26)
-              return (
-                <div
-                  key={num}
-                  aria-hidden={i !== view.step}
-                  style={{ opacity: op, transform: `translateY(${y}px)` }}
-                >
-                  <div className="step-number">{num}</div>
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </div>
-              )
-            })}
-          </div>
-          <div className="how-phone" aria-hidden="true">
-            {howSteps.map(([num, , , screen], i) => {
-              const { op, y } = layerState(i, 48)
-              return (
-                <img
-                  key={num}
-                  src={screen}
-                  alt=""
-                  style={{ opacity: op, transform: `translateY(${y}px) scale(${0.96 + 0.04 * op})` }}
-                />
-              )
-            })}
-          </div>
-        </div>
         <div className="steps">
           {howSteps.map(([num, title, copy, screen], i) => (
             <article
@@ -1349,11 +1265,10 @@ function RecipeDiscovery() {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     // Auto-pan for precise pointers; touch users scroll the strip
-    // themselves, so the motion always has a user-controlled alternative.
-    // Like the FAQ marquee, the pan keeps running under reduced motion
-    // (hovering stops it), so the strip never looks frozen.
-    el.classList.toggle("recipe-auto-pan", canTrackPointer)
-    if (!canTrackPointer || reducedMotion) return
+        // themselves, so the motion always has a user-controlled alternative.
+        // Under reduced motion the strip stays still but natively scrollable.
+        el.classList.toggle("recipe-auto-pan", canTrackPointer && !reducedMotion)
+        if (!canTrackPointer || reducedMotion) return
     let target = el.scrollLeft
     let raf = 0
     const tick = () => {
