@@ -28,7 +28,6 @@ import talkCookScreen from "./Images/talk-ask-and-cook.png"
 import tomatoPappuImage from "./Images/tomato-pappu.jpg"
 import vankayaPulusuImage from "./Images/vankaya-pulusu.jpg"
 import verusenagaChutneyImage from "./Images/verusenaga-chutney.jpg"
-import { tickValue } from "./lib/number-ticker"
 
 const images = {
   hero: "https://images.unsplash.com/photo-1743517894265-c86ab035adef?auto=format&fit=crop&w=1200&q=85",
@@ -64,6 +63,13 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     close: (
       <>
         <path d="m6 6 12 12M18 6 6 18" />
+      </>
+    ),
+    chevron: <path d="m6 9 6 6 6-6" />,
+    chat: (
+      <>
+        <path d="M21 12a8 8 0 0 1-8 8H4l2-3.2A8 8 0 1 1 21 12Z" />
+        <path d="M8.5 10.5h7M8.5 14h4" />
       </>
     ),
     check: <path d="m5 12 4 4L19 6" />,
@@ -233,7 +239,128 @@ function HomeScreenPhone() {
   )
 }
 
-function Navbar() {
+function CountryDropdown({
+  country,
+  onChange,
+}: {
+  country: Country
+  onChange: (country: Country) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+    const onClick = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(".country-drop")) setOpen(false)
+    }
+    window.addEventListener("keydown", onKey)
+    window.addEventListener("click", onClick)
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      window.removeEventListener("click", onClick)
+    }
+  }, [open])
+
+  return (
+    <div className="country-drop">
+      <button
+        type="button"
+        className="country-btn"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label="Choose country"
+        aria-controls="country-menu"
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
+            e.preventDefault()
+            setOpen(true)
+            requestAnimationFrame(() => {
+              const options = document.querySelectorAll<HTMLLIElement>(
+                ".country-menu [role=option]",
+              )
+              const first =
+                e.key === "ArrowUp" || e.key === "End" ? options.length - 1 : 0
+              options[first]?.focus()
+              options[first]?.click()
+            })
+          }
+        }}
+      >
+        {COUNTRIES.find((c) => c.id === country)?.label}
+        <Icon name="chevron" size={14} />
+      </button>
+      <ul
+        id="country-menu"
+        className={`country-menu ${open ? "open" : ""}`}
+        role="listbox"
+        aria-label="Country"
+        onKeyDown={(e) => {
+          const options = Array.from(
+            e.currentTarget.querySelectorAll<HTMLLIElement>("[role=option]"),
+          )
+          const current = options.findIndex(
+            (o) => o.getAttribute("aria-selected") === "true",
+          )
+          const last = options.length - 1
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault()
+            const step = e.key === "ArrowDown" ? 1 : -1
+            const next =
+              current < 0
+                ? step > 0
+                  ? 0
+                  : last
+                : Math.min(last, Math.max(0, current + step))
+            options[next]?.focus()
+            options[next]?.click()
+          } else if (e.key === "Home" || e.key === "End") {
+            e.preventDefault()
+            const next = e.key === "Home" ? 0 : last
+            options[next]?.focus()
+            options[next]?.click()
+          }
+        }}
+      >
+        {COUNTRIES.map((c) => (
+          <li
+            key={c.id}
+            role="option"
+            tabIndex={open && country === c.id ? 0 : -1}
+            aria-selected={country === c.id}
+            className={`country-option ${
+              country === c.id ? "is-selected" : ""
+            }`}
+            onClick={() => {
+              onChange(c.id)
+              setOpen(false)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                onChange(c.id)
+                setOpen(false)
+              }
+            }}
+          >
+            {c.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function Navbar({
+  country,
+  onCountryChange,
+}: {
+  country: Country
+  onCountryChange: (country: Country) => void
+}) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -295,6 +422,7 @@ function Navbar() {
             Download app
           </a>
         </div>
+        <CountryDropdown country={country} onChange={onCountryChange} />
         <a className="nav-cta" href="#download">
           Download app <Icon name="arrow" size={17} />
         </a>
@@ -314,23 +442,23 @@ function Navbar() {
 const problems = [
   [
     "play",
-    "Pause. Rewind. Repeat.",
-    "Recipe videos aren't designed for hands covered in atta.",
+    "Pause Rewind Repeat",
+    "Recipe videos aren't designed for hands covered in atta",
   ],
   [
     "spark",
     "No one to ask",
-    "Small doubts can turn into a dinner-sized problem.",
+    "Small doubts can turn into a dinner-sized problem",
   ],
   [
     "leaf",
-    "What can I make?",
-    "Good ingredients wait while inspiration runs out.",
+    "What can I make",
+    "Good ingredients wait while inspiration runs out",
   ],
   [
     "pot",
     "Too many things at once",
-    "Timers, pans, and steps are easy to lose track of.",
+    "Timers, pans, and steps are easy to lose track of",
   ],
 ]
 
@@ -339,8 +467,8 @@ const conversations = [
     tab: "A step",
     title: "A Step interface",
     image: stepScreen,
-    user: "Ruchi, next enti?",
-    answer: "Now add the onions and sauté until they turn soft.",
+    user: "Ruchi, next enti",
+    answer: "Now add the onions and sauté until they turn soft",
   },
   {
     tab: "A mistake",
@@ -348,14 +476,14 @@ const conversations = [
     image: mistakeScreen,
     user: "Ruchi, paneer overcook iyindhi",
     answer:
-      "Parledu, let's see how we can fix it. Remove the unburnt pieces without scraping the pan.",
+      "Parledu, let's see how we can fix it Remove the unburnt pieces without scraping the pan",
   },
   {
     tab: "A timer",
     title: "A Timer interface",
     image: timerScreen,
-    user: "Remind me in five minutes.",
-    answer: "Done. I'll let you know when your pappu is ready to check.",
+    user: "Remind me in five minutes",
+    answer: "Done I'll let you know when your pappu is ready to check",
   },
 ]
 
@@ -367,89 +495,57 @@ type Billing = "monthly" | "yearly"
 
 const YEARLY_DISCOUNT = "Save 20%"
 
-/** Placeholder defaults from the launch template — final Ruchi pricing is TBD. */
+type Country = "india" | "us"
+
+const COUNTRIES: { id: Country; label: string }[] = [
+  { id: "india", label: "India" },
+  { id: "us", label: "US" },
+]
+
+const PRICING: Record<
+  Country,
+  { price: Record<Billing, string>; billed: Record<Billing, string> }
+> = {
+  india: {
+    price: { monthly: "Rs 499/month", yearly: "Rs 399/month" },
+    billed: { monthly: "Billed monthly", yearly: "Rs 4,788 billed yearly" },
+  },
+  us: {
+    price: { monthly: "$4.99/month", yearly: "$3.99/month" },
+    billed: { monthly: "Billed monthly", yearly: "$47.88 billed yearly" },
+  },
+}
+
 const PLANS = [
   {
     name: "Free",
-    description: "Explore the core Ruchi experience.",
-    price: { monthly: 0, yearly: 0 },
-    cta: "Try Ruchi",
+    description: "Everyday cooking support for getting started",
+    price: { monthly: "Free", yearly: "Free" },
+    billed: { monthly: "No payment required", yearly: "No payment required" },
+    cta: "Get started",
     featured: false,
     features: [
-      "Core recipe discovery",
-      "Guided cooking basics",
-      "Telugu & English, hands-free",
+      "Core Recipe Discovery",
+      "Quick Recipes",
+      "Basic Voice Companion",
     ],
   },
   {
-    name: "Ruchi Plus",
-    description: "For regular cooks who want more assistance.",
-    price: { monthly: 15, yearly: 12 },
-    cta: "Join early access",
+    name: "Premium",
+    description: "More guidance for confident everyday cooking",
+    price: { monthly: "Rs 499/month", yearly: "Rs 399/month" },
+        billed: { monthly: "Billed monthly", yearly: "Rs 4,788 billed yearly" },
+    cta: "Choose Premium",
     featured: true,
     features: [
-      "Expanded cooking guidance",
-      "More saved recipes",
-      "Mistake recovery help",
-      "Early access priority",
-    ],
-  },
-  {
-    name: "Ruchi Family",
-    description: "For households cooking and saving together.",
-    price: { monthly: 40, yearly: 32 },
-    cta: "Join early access",
-    featured: false,
-    features: [
-      "Shared family collection",
-      "Recipe notes & memories",
-      "Household profiles",
+      "Unlimited Voice Guidance",
+      "Ad-Free Experience",
+      "Family Meal Planner",
     ],
   },
 ] as const
 
-const usd = (n: number) => `$${n.toLocaleString("en-US")}`
-
-/** Counts between price values with an interruptible ease-out ramp. */
-function NumberTicker({
-  value,
-  startValue,
-  prefix,
-}: {
-  value: number
-  startValue: number
-  prefix?: string
-}) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const currentRef = useRef(startValue)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.textContent = `${prefix ?? ""}${value}`
-      currentRef.current = value
-      return
-    }
-    const from = currentRef.current
-    const dur = 550
-    let raf = 0
-    const t0 = performance.now()
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - t0) / dur)
-      const v = tickValue(from, value, p)
-      el.textContent = `${prefix ?? ""}${v}`
-      currentRef.current = v
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [value, prefix])
-
-  return <span ref={ref}>{`${prefix ?? ""}${startValue}`}</span>
-}
-
-function PricingSection() {
+function PricingSection({ country }: { country: Country }) {
   const [billing, setBilling] = useState<Billing>("monthly")
 
   return (
@@ -457,8 +553,8 @@ function PricingSection() {
       <div className="container">
         <SectionHeading
           eyebrow="SIMPLE, HONEST PLANS"
-          title="Choose a plan that fits your kitchen."
-          copy="Pricing and final plan entitlements are coming soon. Join the early access list to be the first to know."
+          title="Choose a plan that fits your kitchen"
+          copy="Start with the essentials, or unlock unlimited guidance with Premium"
         />
 
         <div
@@ -502,66 +598,51 @@ function PricingSection() {
         </p>
 
         <div className="plan-grid">
-          {PLANS.map((plan, i) => {
-            const price = plan.price[billing]
-            return (
-              <article
-                key={plan.name}
-                className={`plan-card reveal ${plan.featured ? "featured" : ""}`}
-                style={
-                  { "--stagger": `${150 + i * 80}ms` } as React.CSSProperties
-                }
-              >
-                {plan.featured && <span className="plan-beam" aria-hidden />}
+          {PLANS.map((plan, i) => (
+            <article
+              key={plan.name}
+              className={`plan-card reveal ${plan.featured ? "featured" : ""}`}
+              style={
+                { "--stagger": `${150 + i * 80}ms` } as React.CSSProperties
+              }
+            >
+              {plan.featured && (
+                <span className="plan-badge">Most popular</span>
+              )}
 
-                <div className="plan-head">
-                  <h3>{plan.name}</h3>
-                  {plan.featured && (
-                    <span className="plan-badge">
-                      <Icon name="spark" size={13} /> Most popular
-                    </span>
-                  )}
-                </div>
-                <p className="plan-desc">{plan.description}</p>
+              <div className="plan-head">
+                <h3>{plan.name}</h3>
+              </div>
+              <p className="plan-desc">{plan.description}</p>
 
-                <p className="plan-price">
-                  <NumberTicker
-                    value={price}
-                    startValue={plan.price.monthly}
-                    prefix="$"
-                  />
-                  <span className="per">per month</span>
-                </p>
-                <p className="plan-billed">
-                  {billing === "yearly"
-                    ? `${usd(price * 12)} billed yearly`
-                    : "Billed monthly"}
-                </p>
+              <p className="plan-price">
+                <span>
+                  {plan.featured
+                    ? PRICING[country].price[billing]
+                    : plan.price[billing]}
+                </span>
+              </p>
+              <p className="plan-billed">
+                {plan.featured
+                  ? PRICING[country].billed[billing]
+                  : plan.billed[billing]}
+              </p>
 
-                <Button secondary={!plan.featured} href="#download">
-                  {plan.cta}
-                </Button>
+              <ul className="plan-features">
+                {plan.features.map((feature) => (
+                  <li key={feature}>
+                    <Icon name="check" size={16} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
 
-                <ul className="plan-features">
-                  {plan.features.map((feature) => (
-                    <li key={feature}>
-                      <Icon name="check" size={16} />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            )
-          })}
+              <Button secondary={!plan.featured} href="#download">
+                {plan.cta}
+              </Button>
+            </article>
+          ))}
         </div>
-
-        <p
-          className="plan-footnote reveal"
-          style={{ "--stagger": "420ms" } as React.CSSProperties}
-        >
-          Prices in USD, excluding tax. Final Ruchi pricing and entitlements
-          are coming soon — the figures above are placeholder defaults.
-        </p>
       </div>
     </section>
   )
@@ -670,11 +751,11 @@ function DemoSection() {
         </div>
         <div className="meet-copy reveal">
           <span className="eyebrow">A CONVERSATION, NOT A CHECKLIST</span>
-          <h2>Meet Ruchi. More than a recipe app.</h2>
+          <h2>Meet Ruchi More than a recipe app</h2>
           <p>
-            Ask questions the way you would in your own kitchen. Ruchi remembers
+            Ask questions the way you would in your own kitchen Ruchi remembers
             where you are in the recipe and responds with practical, contextual
-            help.
+            help
           </p>
           <div
             className="demo-tabs"
@@ -727,6 +808,8 @@ function DemoSection() {
 }
 
 function App() {
+  const [country, setCountry] = useState<Country>("india")
+
   useEffect(() => {
     const lenis = new Lenis({
           autoRaf: true,
@@ -810,7 +893,7 @@ function App() {
 
   return (
     <div id="top">
-      <Navbar />
+      <Navbar country={country} onCountryChange={setCountry} />
       <main>
         <section className="hero">
           <Kolam className="hero-kolam" />
@@ -820,14 +903,14 @@ function App() {
                 YOUR AI COOKING COMPANION
               </span>
               <h1 className="hero-in hero-2">
-                A little help in the kitchen.
+                A little help in the kitchen
                 <br />
-                <em>A feeling of home.</em>
+                <em>A feeling of home</em>
               </h1>
               <p className="hero-in hero-3">
                 Talk, cook, and create delicious meals with Ruchi — your
                 conversational cooking companion for patient, step-by-step help
-                in Telugu or English.
+                in Telugu or English
               </p>
               <div className="hero-actions hero-in hero-4">
                 <Button>Download Ruchi</Button>
@@ -878,8 +961,8 @@ function App() {
           <div className="container">
             <SectionHeading
               eyebrow="A BETTER WAY TO COOK"
-              title="Cooking shouldn't be complicated."
-              copy="You shouldn't have to keep checking videos with messy hands, guess what comes next, or give up when something goes wrong."
+              title="Cooking shouldn't be complicated"
+              copy="You shouldn't have to keep checking videos with messy hands, guess what comes next, or give up when something goes wrong"
             />
             <div className="problem-grid">
               {problems.map(([icon, title, copy], i) => (
@@ -907,26 +990,26 @@ function App() {
           <div className="container">
             <SectionHeading
               eyebrow="HOW IT WORKS"
-              title="From craving to cooking, in three simple steps."
+              title="From craving to cooking, in three simple steps"
             />
             <div className="steps">
               {[
                 [
                   "01",
-                  "Find your dish.",
-                  "Search a recipe or explore dishes using what you have.",
+                  "Find your dish",
+                  "Search a recipe or explore dishes using what you have",
                   findDishScreen,
                 ],
                 [
                   "02",
-                  "Start cooking.",
-                  "Follow one calm, clear instruction at a time.",
+                  "Start cooking",
+                  "Follow one calm, clear instruction at a time",
                   startCookingScreen,
                 ],
                 [
                   "03",
-                  "Talk, ask, and cook.",
-                  "Clarify steps, pause, set timers, and ask for help.",
+                  "Talk, ask, and cook",
+                  "Clarify steps, pause, set timers, and ask for help",
                   talkCookScreen,
                 ],
               ].map(([num, title, copy, screen], i) => (
@@ -956,7 +1039,7 @@ function App() {
           <div className="container">
             <SectionHeading
               eyebrow="BUILT FOR EVERYDAY LIFE"
-              title="Made for real kitchens and real lives."
+              title="Made for real kitchens and real lives"
             />
             <div className="audience-grid">
               <div className="audience-image reveal">
@@ -967,8 +1050,8 @@ function App() {
                   alt="People preparing a meal together in a home kitchen"
                 />
                 <div>
-                  <strong>Cooking feels easier with a little company.</strong>
-                  <span>Patient help, at your pace.</span>
+                  <strong>Cooking feels easier with a little company</strong>
+                  <span>Patient help, at your pace</span>
                 </div>
               </div>
               <div className="audience-list">
@@ -976,27 +1059,27 @@ function App() {
                   [
                     "01",
                     "Students",
-                    "Learn everyday cooking without the overwhelm.",
+                    "Learn everyday cooking without the overwhelm",
                   ],
                   [
                     "02",
                     "Busy professionals",
-                    "Get dinner moving while you multitask.",
+                    "Get dinner moving while you multitask",
                   ],
                   [
                     "03",
                     "New cooks",
-                    "Ask every small question without hesitation.",
+                    "Ask every small question without hesitation",
                   ],
                   [
                     "04",
                     "Hands-free cooks",
-                    "Keep messy hands away from the screen.",
+                    "Keep messy hands away from the screen",
                   ],
                   [
                     "05",
                     "Families",
-                    "Preserve recipes in the words you remember.",
+                    "Preserve recipes in the words you remember",
                   ],
                 ].map(([num, title, copy], i) => (
                   <div
@@ -1018,7 +1101,7 @@ function App() {
           </div>
         </section>
 
-                <PricingSection />
+                <PricingSection country={country} />
 
                 <section className="story">
           <div className="story-image reveal">
@@ -1032,15 +1115,15 @@ function App() {
           <div className="story-copy reveal">
             <Kolam />
             <span className="eyebrow">WHY RUCHI EXISTS</span>
-            <h2>More than food. It's family, culture, and memories.</h2>
+            <h2>More than food It's family, culture, and memories</h2>
             <p>
               Every kitchen has its own stories, little traditions, and recipes
-              passed from one generation to the next. Ruchi helps you explore
+              passed from one generation to the next Ruchi helps you explore
               new dishes and preserve the flavours and memories that make
-              cooking personal.
+              cooking personal
             </p>
             <blockquote>
-              “A pinch” and “until it smells right” are part of the recipe too.
+              “A pinch” and “until it smells right” are part of the recipe too
             </blockquote>
           </div>
         </section>
@@ -1062,10 +1145,10 @@ function App() {
           </div>
           <div className="download-copy reveal">
             <span className="eyebrow">COMING TO YOUR KITCHEN</span>
-            <h2>Your next favourite dish starts with a conversation.</h2>
+            <h2>Your next favourite dish starts with a conversation</h2>
             <p>
               Bring a little more confidence, creativity, and joy to your
-              everyday cooking.
+              everyday cooking
             </p>
             <a
               className="button light-button"
@@ -1185,9 +1268,11 @@ function RecipeDiscovery() {
     const reducedMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    // Auto-pan only for precise pointers; touch users scroll the strip
+    // Auto-pan for precise pointers; touch users scroll the strip
     // themselves, so the motion always has a user-controlled alternative.
-    el.classList.toggle("recipe-auto-pan", canTrackPointer && !reducedMotion)
+    // Like the FAQ marquee, the pan keeps running under reduced motion
+    // (hovering stops it), so the strip never looks frozen.
+    el.classList.toggle("recipe-auto-pan", canTrackPointer)
     if (!canTrackPointer || reducedMotion) return
     let target = el.scrollLeft
     let raf = 0
@@ -1220,14 +1305,15 @@ function RecipeDiscovery() {
       <div className="container">
         <SectionHeading
           eyebrow="RECIPE DISCOVERY"
-          title="Discover something delicious."
-          copy="A thoughtful mix of Telugu favourites and everyday South Indian comfort food."
+          title="Discover something delicious"
+          copy="A thoughtful mix of Telugu favourites and everyday South Indian comfort food"
         />
-        <div
-          className="recipe-viewport reveal"
-          ref={viewportRef}
-          data-lenis-prevent
-        >
+      </div>
+      <div
+        className="recipe-viewport reveal"
+        ref={viewportRef}
+        data-lenis-prevent
+      >
           <div className="recipe-grid">
             {[...recipes, ...recipes].map(
               ([image, title, category, copy], i) => {
@@ -1263,15 +1349,14 @@ function RecipeDiscovery() {
             )}
           </div>
         </div>
-      </div>
     </section>
   )
 }
 
 const faqData: FaqData = {
-  mainTitle: "Got questions? Let's clear them up.",
+  mainTitle: "Got questions Let's clear them up",
   mainSubtitle:
-    "Everything we can confirm today, without the fine-print fog. Still unsure? Write to us at hello@ruchi.app.",
+    "Everything we can confirm today, without the fine-print fog Still unsure Write to us at hello@ruchi.app",
   rows: [
     {
       id: "row1",
@@ -1280,15 +1365,15 @@ const faqData: FaqData = {
       items: [
         {
           id: "q1",
-          question: "Is Ruchi free to use?",
+          question: "Is Ruchi free to use",
           answer:
-            "Ruchi will include a free way to explore the core experience. Final limits and paid plan details will be published before launch.",
+            "Ruchi will include a free way to explore the core experience Final limits and paid plan details will be published before launch",
         },
         {
           id: "q2",
-          question: "Does Ruchi support Telugu?",
+          question: "Does Ruchi support Telugu",
           answer:
-            "Yes. Ruchi is designed for natural cooking guidance in Telugu and English.",
+            "Yes Ruchi is designed for natural cooking guidance in Telugu and English",
         },
       ],
     },
@@ -1299,15 +1384,15 @@ const faqData: FaqData = {
       items: [
         {
           id: "q3",
-          question: "Do I need to know how to cook?",
+          question: "Do I need to know how to cook",
           answer:
-            "Not at all. Ruchi breaks recipes into clear steps and lets you ask for clarification whenever you need it.",
+            "Not at all Ruchi breaks recipes into clear steps and lets you ask for clarification whenever you need it",
         },
         {
           id: "q4",
-          question: "Can I use Ruchi while my hands are busy?",
+          question: "Can I use Ruchi while my hands are busy",
           answer:
-            "Voice-guided cooking is central to Ruchi, so you can move through steps and manage timers with less screen touching.",
+            "Voice-guided cooking is central to Ruchi, so you can move through steps and manage timers with less screen touching",
         },
       ],
     },
@@ -1318,15 +1403,15 @@ const faqData: FaqData = {
       items: [
         {
           id: "q5",
-          question: "What happens if I make a cooking mistake?",
+          question: "What happens if I make a cooking mistake",
           answer:
-            "Ruchi can suggest practical ways to recover from common issues such as a dish being too salty, spicy, watery, bland, or slightly burnt.",
+            "Ruchi can suggest practical ways to recover from common issues such as a dish being too salty, spicy, watery, bland, or slightly burnt",
         },
         {
           id: "q6",
-          question: "Is Ruchi available for Android and iOS?",
+          question: "Is Ruchi available for Android and iOS",
           answer:
-            "Platform availability is still being confirmed. Join early access for verified launch updates.",
+            "Platform availability is still being confirmed Join early access for verified launch updates",
         },
       ],
     },
@@ -1337,15 +1422,15 @@ const faqData: FaqData = {
       items: [
         {
           id: "q7",
-          question: "What is included in the paid plans?",
+          question: "What is included in the paid plans",
           answer:
-            "Paid plan entitlements are still being finalised. The pricing section is intentionally labelled as a preview.",
+            "Free covers the everyday essentials — core recipe discovery, quick recipes and basic voice support Premium from Rs 399/month adds unlimited voice guidance, an ad-free experience and a family meal planner",
         },
         {
           id: "q8",
-          question: "Can I cancel my subscription?",
+          question: "Can I cancel my subscription",
           answer:
-            "Cancellation terms will be published with the final subscription policy before paid plans launch.",
+            "Cancellation terms will be published with the final subscription policy before paid plans launch",
         },
       ],
     },
@@ -1356,9 +1441,66 @@ function Faq() {
   return (
     <section className="section faq" id="faq">
       <div className="container">
-        <FaqSection data={faqData} />
+        <div className="faq-marquee">
+          <FaqSection data={faqData} />
+        </div>
+        <FaqAccordion />
       </div>
     </section>
+  )
+}
+
+/** Accordion FAQ, shown on phones only; desktop keeps the marquee rows. */
+function FaqAccordion() {
+  const [open, setOpen] = useState(0)
+  return (
+    <div className="faq-accordion">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <span className="faq-badge">
+          <Icon name="spark" size={13} />
+          FAQ
+        </span>
+        <h2>{faqData.mainTitle}</h2>
+        <p className="faq-subtitle">{faqData.mainSubtitle}</p>
+      </div>
+      <div className="faq-list">
+        {faqData.rows.flatMap((row) => row.items).map((item, index) => (
+          <article
+            className={`faq-item ${open === index ? "open" : ""}`}
+            key={item.id}
+          >
+            <button
+              type="button"
+              aria-expanded={open === index}
+              aria-controls={`faq-answer-${index}`}
+              onClick={() => setOpen(open === index ? -1 : index)}
+            >
+              <span>{item.question}</span>
+              <Icon name="chevron" />
+            </button>
+            <div
+              className="faq-answer"
+              id={`faq-answer-${index}`}
+              aria-hidden={open !== index}
+            >
+              <p>{item.answer}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="faq-cta">
+        <span className="faq-cta-icon">
+          <Icon name="chat" size={16} />
+        </span>
+        <div className="faq-cta-copy">
+          <p>Still have a question</p>
+          <p>We reply within four business hours</p>
+        </div>
+        <a className="button" href="mailto:hello@ruchi.app">
+          Ask us anything <Icon name="arrow" size={15} />
+        </a>
+      </div>
+    </div>
   )
 }
 
@@ -1372,7 +1514,7 @@ function Footer() {
           </a>
           <p>
             A conversational cooking companion for real kitchens, familiar
-            flavours, and everyday confidence.
+            flavours, and everyday confidence
           </p>
         </div>
         <div>
@@ -1393,7 +1535,7 @@ function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© 2026 Ruchi. Built with care.</span>
+        <span>© 2026 Ruchi Built with care</span>
       </div>
     </footer>
   )
